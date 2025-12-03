@@ -141,9 +141,6 @@ A future dataframe for 30 days was created, and predictions were generated.
 To correctly evaluate the model, predicted values were aligned by date with the test set. Evaluation metrics used were:
 
 Mean Absolute Error (MAE)
-
-Mean Squared Error (MSE)
-
 Root Mean Squared Error (RMSE)
 
 The model initially showed a higher error when forecasting the total passengers directly because the total combines many different patterns. However, the methodology is correct for demonstrating Prophet forecasting.
