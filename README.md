@@ -53,7 +53,7 @@ School-day vs non-school-day variations
 
 These patterns confirmed that Prophet is suitable.
 
-**5. Model Used — Prophet**
+**5. Model Used Prophet**
 ```
 Prophet was chosen because it:
 ✔ Handles daily data well
