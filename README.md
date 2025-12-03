@@ -1,18 +1,15 @@
-# Public_Transport_passengers
-DAILY PUBLIC TRANSPORT PASSENGER FORECASTING USING PROPHET MODEL
+Daily Public Transport Passenger Forecasting Using Facebook Prophet
 
-1. Introduction
+📌 1. Project Overview
 
-Public transport systems generate large amounts of operational data every day. Analysing this data helps transport authorities understand passenger demand, plan schedules, allocate resources, and reduce congestion.
-In this project, I worked with a dataset containing daily public transport passenger journeys for multiple service types such as Local Route, Light Rail, Peak Service, Rapid Route, School Service, and Other categories.
+This project focuses on forecasting daily public transport passenger demand using the Prophet model. The dataset contains daily passenger counts across multiple service types (Local Route, Light Rail, Rapid Route, Peak Service, School, Other).
+The goal is to build a forecasting model that helps transport authorities predict demand and improve planning.
 
-The main objective of the study was to build a forecasting model that can predict the number of passengers for the upcoming days. I selected Facebook Prophet, a time-series forecasting model developed by Meta, because it works well with daily data, seasonal patterns, and missing or irregular values.
+📌 2. Dataset Summary
 
-2. Dataset Description
+Columns included:
 
-The dataset includes the following fields:
-
-Date: The day of transport operation
+Date
 
 Local Route
 
@@ -25,104 +22,46 @@ Rapid Route
 School
 
 Other
-Each column represents the total number of passengers using that service type on that particular day.
 
-Since each service type has different operational patterns, the dataset behaves as a multi-seasonal time-series. Understanding and preparing the dataset correctly is important before building a forecasting model.
+A new column Total was created to represent overall daily passengers.
 
-3. Data Pre-Processing Steps
+📌 3. Data Pre-Processing
 
-Before applying Prophet, several cleaning and preparation steps were performed:
+Key cleaning steps:
 
-3.1 Handling Missing Values
+Missing values in “Other” replaced with column mean
 
-Some records in the Other service category had missing values. These were replaced using the mean of that column to maintain the overall trend without introducing bias.
+Invalid zeros replaced with mean of non-zero values
 
-3.2 Replacing Zero Values
+Converted “Date” to datetime format
 
-Certain service columns had zeros which were not actual zero passengers but recording gaps. I replaced all zeros with the mean of the non-zero values in each column. This avoids misleading the model with invalid zeros.
+Set “Date” as index and sorted
 
-3.3 Converting Date Column
+Created Total = sum of all service columns
 
-The Date column was converted to datetime format using:
+📌 4. Exploratory Data Analysis
 
-df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+Observations from the Total passenger plot:
 
+Weekly demand cycles
 
-This is important because Prophet requires the date column to be in proper datetime format.
+Monthly and yearly variations
 
-3.4 Setting Date as Index
+Peaks during holidays
 
-After conversion, the Date column was set as the index and sorted in chronological order. This prepares the data for proper time-series modelling.
+School-day vs non-school-day variations
 
-3.5 Creating Total Passenger Column
+These patterns confirmed that Prophet is suitable.
 
-A new column Total was created by summing all service categories:
+📌 5. Model Used — Prophet
+```
+Prophet was chosen because it:
+✔ Handles daily data well
+✔ Automatically detects seasonality
+✔ Manages missing/irregular data
+✔ Is easy to interpret
 
-df['Total'] = df[cols].sum(axis=1)
-
-
-This represents the overall passenger count for each day and is useful for trend analysis.
-
-4. Exploratory Data Analysis (EDA)
-
-The Total passenger values were plotted over time. This helped to observe:
-
-Rising and falling trends
-
-Seasonal weekly and monthly patterns
-
-Sudden peaks during holidays
-
-Variations due to school terms and workdays
-
-The time-series was irregular and multi-seasonal, confirming that Prophet is a suitable model.
-
-5. Model Selection and Justification
-
-I selected the Prophet model for forecasting because:
-
-It automatically handles daily, weekly, and yearly seasonal patterns
-
-It allows adding custom seasonalities
-
-It works well even when data has missing values
-
-It is simple to train and interpret
-
-It generates trend, seasonality, and forecast components
-
-Prophet is widely used for business forecasting in areas like traffic, sales, and resource planning.
-
-6. Train–Test Split
-
-To evaluate model performance, the last 30 days were kept as the test set, and the remaining data was used for training.
-
-train = df.iloc[:-30]
-test  = df.iloc[-30:]
-
-
-Prophet requires the column names:
-
-ds – date
-
-y – target value
-
-So the training and testing DataFrames were created accordingly.
-
-7. Prophet Model Training
-
-A tuned version of Prophet was used with:
-
-Weekly seasonality
-
-Yearly seasonality
-
-No daily seasonality
-
-Moderate trend flexibility using changepoint_prior_scale
-
-Additional custom seasonalities if required
-
+Model configuration:
 model = Prophet(
     weekly_seasonality=True,
     yearly_seasonality=True,
@@ -130,35 +69,42 @@ model = Prophet(
     changepoint_prior_scale=0.8,
     seasonality_prior_scale=2.5
 )
+```
+📌 6. Train–Test Split
 
+Last 30 days → Test
 
-The model was then fitted on the training set.
+Remaining → Train
 
-8. Forecasting and Evaluation
+Columns renamed for Prophet:
 
-A future dataframe for 30 days was created, and predictions were generated.
+ds → Date
 
-To correctly evaluate the model, predicted values were aligned by date with the test set. Evaluation metrics used were:
+y → Target (Total passengers)
 
-Mean Absolute Error (MAE)
-Root Mean Squared Error (RMSE)
+📌 7. Forecasting & Evaluation
 
-The model initially showed a higher error when forecasting the total passengers directly because the total combines many different patterns. However, the methodology is correct for demonstrating Prophet forecasting.
+30-day future dataframe created
 
-9. Key Findings
+Predictions aligned with test dates
 
-Prophet successfully captured general patterns in the dataset such as weekly passenger cycles.
+Evaluation metrics used:
 
-The model performed reasonably but showed limitations when predicting the total passenger count directly due to high variability.
+MAE (Mean Absolute Error)
 
-Forecasts for the next 7 days were generated using the fitted model.
+RMSE (Root Mean Squared Error)
 
-For highest accuracy, forecasting should be done separately for each service category, but demonstrating the total forecast is sufficient for this project.
+Prophet captured the overall weekly trend but struggled with the high variability in the total passenger data. Forecasts for the next 7 days were generated.
 
-10. Conclusion
+📌 8. Key Findings
 
-This project demonstrates a complete workflow for forecasting daily public transport demand using Prophet. The steps included cleaning raw data, handling missing and zero values, performing EDA, preparing time-series data, splitting into train and test sets, training the Prophet model, and evaluating the results.
+Prophet models weekly patterns well
 
-Prophet proved to be a simple and interpretable tool that captures important seasonal effects in transportation data. The generated forecasts can help transport agencies in planning bus frequency, allocating resources, predicting peak demand, and improving overall service efficiency.
+Total passenger count is harder to predict because it mixes different behaviours
 
-The project shows that time-series forecasting is a powerful technique for solving real-world operational problems in the public transport sector.
+Better accuracy is possible by forecasting each service type separately
+
+📌 9. Conclusion
+
+This project demonstrates a complete, end-to-end workflow for time-series forecasting using Prophet. It includes data cleaning, EDA, model building, forecasting, and evaluation.
+Prophet proved effective for detecting seasonal behaviour in public transport usage and can support scheduling, resource allocation, and operational planning.
